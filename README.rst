@@ -2,7 +2,7 @@
 file_to_bitmap 
 *************
 
-Convert any file to a bitmap and back again. The resulting bitmap is be a visual representation of the original file. The last pixel contains the size of the original file.
+Convert any file to a bitmap and back again. The resulting bitmap is a visual representation of the original file. The last pixel contains the size of the original file.
 
 
 For example, consider this most glorious of audio examples:
