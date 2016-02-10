@@ -14,15 +14,18 @@ For example, consider this most glorious of audio examples:
     :align: center
 
 
+**Python 3 only.**
+
+
 To a bitmap:
 
 .. code-block:: bash
 
-    $ python file_to_bitmap.py to input.file output.bmp
+    $ python3 file_to_bitmap.py to input.file output.bmp
 
 
 To the original file:
 
 .. code-block:: bash
 
-    $ python file_to_bitmap.py from input.bmp output.file
+    $ python3 file_to_bitmap.py from input.bmp output.file
