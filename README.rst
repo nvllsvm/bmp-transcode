@@ -7,11 +7,8 @@ Convert any file to a bitmap and back again. The resulting bitmap is a visual re
 
 For example, consider this most glorious of audio examples:
 
-.. image:: http://nullsum.net/example.bmp
+.. image:: https://raw.githubusercontent.com/nvllsvm/file_to_bitmap/master/example.bmp
     :alt: Maybe you should try listening this...
-    :width: 400
-    :height: 229
-    :align: center
 
 
 **Python 3 only.**
