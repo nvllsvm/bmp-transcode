@@ -1,13 +1,12 @@
-*************
-file_to_bitmap 
-*************
+bmp-transcode
+=============
 
 Convert any file to a bitmap and back again. The resulting bitmap is a visual representation of the original file. The last pixel contains the size of the original file.
 
 
 For example, consider this most glorious of audio examples:
 
-.. image:: https://raw.githubusercontent.com/nvllsvm/file_to_bitmap/master/example.bmp
+.. image:: https://raw.githubusercontent.com/nvllsvm/bmp-transcode/master/example.bmp
     :alt: Maybe you should try listening this...
 
 
@@ -16,13 +15,13 @@ For example, consider this most glorious of audio examples:
 
 To a bitmap:
 
-.. code-block:: bash
+.. code:: shell
 
-    $ python3 file_to_bitmap.py to input.file output.bmp
+    $ bmp-transcode to input.file output.bmp
 
 
 To the original file:
 
-.. code-block:: bash
+.. code:: shell
 
-    $ python3 file_to_bitmap.py from input.bmp output.file
+    $ bmp-transcode from input.bmp output.file
