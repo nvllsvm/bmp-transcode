@@ -82,7 +82,7 @@ def get_rgb(path):
             yield tuple(int_bytes)
 
 
-def file_to_image(input_file, output_file, width=DEFAULT_WIDTH, height=None):
+def file_to_image(input_file, output_file, width):
     file_bytes = []
     with open(input_file, 'rb') as f:
         byte = f.read(1)
@@ -133,16 +133,19 @@ def main():
     sp = parser.add_subparsers()
     sp_to = sp.add_parser('to', help='To bitmap')
     sp_from = sp.add_parser('from', help='From bitmap')
-    sp_to.set_defaults(func=file_to_image)
-    sp_from.set_defaults(func=image_to_file)
+    sp_to.set_defaults(mode='to')
+    sp_from.set_defaults(mode='from')
+    sp_to.add_argument('-w', '--width',
+                       default=DEFAULT_WIDTH, type=int,
+                       help=f'width of the image. Default is {DEFAULT_WIDTH}')
     parser.add_argument('input_file')
     parser.add_argument('output_file')
-
     args = parser.parse_args()
-    input_file = args.input_file
-    output_file = args.output_file
 
-    args.func(input_file, output_file)
+    if args.mode == 'from':
+        image_to_file(args.input_file, args.output_file)
+    elif args.mode == 'to':
+        file_to_image(args.input_file, args.output_file, args.width)
 
 
 if __name__ == '__main__':
