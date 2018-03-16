@@ -1,14 +1,14 @@
 import argparse
 import os
 
-from PIL import Image
+import PIL.Image
 
 
 DEFAULT_WIDTH = 800
 
 
 def image_to_file(input_file, output_file):
-    im = Image.open(input_file)
+    im = PIL.Image.open(input_file)
     width, height = im.size
 
     pix = im.load()
@@ -99,7 +99,7 @@ def file_to_image(input_file, output_file, width=DEFAULT_WIDTH, height=None):
         height += 1
 
     size = (width, height)
-    im = Image.new('RGB', size)
+    im = PIL.Image.new('RGB', size)
 
     pix = im.load()
 
