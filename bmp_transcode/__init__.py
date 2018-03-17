@@ -1,131 +1,124 @@
 import argparse
-import os
+import io
+import math
 
 import PIL.Image
 
 
-DEFAULT_WIDTH = 800
+# Sizes larger than this may trip decompression bomb checks in pillow
+# https://github.com/python-pillow/Pillow/blob/ddc9e73b476965b17d9b6c8513da78a0b0877d57/src/PIL/Image.py#L2497
+MAX_FILE_SIZE = PIL.Image.MAX_IMAGE_PIXELS * 3
 
 
-def image_to_file(input_file, output_file):
-    im = PIL.Image.open(input_file)
-    width, height = im.size
+class ImageFile:
 
-    pix = im.load()
-    (r, g, b) = pix[width-1, height-1]
+    def __init__(self, path, mode='r'):
+        self.path = path
+        self.mode = mode
+        self.error = False
 
-    original_size = get_original_size((r, g, b))
+        if self.mode == 'r':
+            self.image = PIL.Image.open(path)
+            self.data = self.image.tobytes()
 
-    original_file = []
+            width, height = self.image.size
+            start_index = -1 * num_size_bytes(width * height)
+            self.size = bytes_to_int(self.data[start_index:])
+        elif self.mode == 'w':
+            self.data = bytearray()
+            self.size = 0
+        else:
+            raise ValueError("invalid mode: '{}'".format(mode))
 
-    count = 0
+    def read(self):
+        if self.mode != 'r':
+            raise io.UnsupportedOperation()
+        return self.data[:self.size]
 
-    x = 0
-    y = 0
+    def write(self, data):
+        if self.mode != 'w':
+            raise io.UnsupportedOperation()
 
-    for i in range(width * height):
-        if x == width:
-            x = 0
-            y += 1
+        _data = bytearray(data)
+        new_size = self.size + len(_data)
+        self._check_size(new_size)
 
-        (r, g, b) = pix[x, y]
+        self.size = new_size
+        self.data.extend(_data)
 
-        for subpixel in pix[x, y]:
-            if count != original_size:
-                b = bytes([subpixel])
-                original_file.append(b)
-                count += 1
+    def close(self):
+        if self.error:
+            return
 
-        x += 1
+        if self.mode == 'w':
+            size = len(self.data)
+            size_block = int_to_bytes(size)
 
-    output = open(output_file, 'wb')
-    for b in original_file:
-        output.write(b)
+            width = math.ceil(math.sqrt(size / 3))
+            height = math.ceil(size / width / 3)
 
+            while True:
+                max_size = (width * height) * 3
+                self._check_size(max_size)
+                max_size_block = num_size_bytes(max_size)
+                extra_bytes = max_size - size - max_size_block
+                if extra_bytes < 0:
+                    height += 1
+                else:
+                    extra_bytes += max_size_block - len(size_block)
+                    break
 
-def get_original_size(pixel):
-    binary_string = ''
+            self.data.extend([0 for _ in range(extra_bytes)])
+            self.data.extend(size_block)
 
-    for s in pixel:
-        n = "{0:b}".format(s).zfill(8)
-        binary_string += n
+            image = PIL.Image.frombytes('RGB', (width, height),
+                                        bytes(self.data))
+            image.save(self.path)
+            image.close()
+        elif self.mode == 'r':
+            self.image.close()
 
-    return int(binary_string, base=2)
+    def _check_size(self, size):
+        if size > MAX_FILE_SIZE:
+            self.error = True
+            raise ValueError('combined input must not exceed {} bytes'.format(
+                MAX_FILE_SIZE))
 
+    def __enter__(self):
+        return self
 
-def read_in_chunks(file_object, chunk_size=3072):
-    while True:
-        data = file_object.read(chunk_size)
-        if not data:
-            break
-        yield data
-
-
-def get_rgb(path):
-    binary_file = open(path, 'rb')
-
-    for chunk in read_in_chunks(binary_file):
-        chunk_len = len(chunk)
-        for i in range(0, chunk_len, 3):
-            int_bytes = []
-            for b in chunk[i:i+3]:
-                new_byte = b
-                int_bytes.append(new_byte)
-
-            # change this
-            if len(int_bytes) == 2:
-                int_bytes.append(0)
-            elif len(int_bytes) == 1:
-                int_bytes.append(0)
-                int_bytes.append(0)
-
-            yield tuple(int_bytes)
+    def __exit__(self, *args):
+        self.close()
 
 
-def file_to_image(input_file, output_file, width):
-    file_bytes = []
-    with open(input_file, 'rb') as f:
-        byte = f.read(1)
-        while byte != b"":
-            file_bytes.append(byte)
-            byte = f.read(1)
+def bytes_to_int(bs):
+    return sum([b << 8*(len(bs)-i-1) for i, b in enumerate(bs)])
 
-    num_bytes = os.path.getsize(input_file)
 
-    height = num_bytes // width // 3
-    remainder = num_bytes % width
+def num_size_bytes(number):
+    return math.ceil(math.log(number, 2) / 8)
 
-    if remainder > 0:
-        height += 1
 
-    size = (width, height)
-    im = PIL.Image.new('RGB', size)
+def int_to_bytes(number):
+    return bytearray([
+        number >> (i-1)*8 & 255
+        for i in range(num_size_bytes(number), 0, -1)])
 
-    pix = im.load()
 
-    x = 0
-    y = 0
+def image_to_file(input_file, output_path):
+    with open(output_path, 'wb') as output_file:
+        with ImageFile(input_file) as image:
+            output_file.write(image.read())
 
-    for c in get_rgb(input_file):
-        pix[x, y] = c
-        x += 1
 
-        if x == width:
-            x = 0
-            y += 1
-
-    x = width - 1
-
-    binary_string = str(bin(num_bytes))[2:].zfill(24)
-    r = int(binary_string[0:8], 2)
-    g = int(binary_string[8:16], 2)
-    b = int(binary_string[16:24], 2)
-
-    size_pixel = (r, g, b)
-
-    pix[x, y] = size_pixel
-
-    im.save(output_file)
+def file_to_image(input_file, output_file):
+    with ImageFile(output_file, 'w') as image:
+        with open(input_file, 'rb') as f:
+            while True:
+                chunk = f.read()
+                if chunk == b'':
+                    break
+                image.write(chunk)
 
 
 def main():
@@ -135,9 +128,6 @@ def main():
     sp_from = sp.add_parser('from', help='From bitmap')
     sp_to.set_defaults(mode='to')
     sp_from.set_defaults(mode='from')
-    sp_to.add_argument('-w', '--width',
-                       default=DEFAULT_WIDTH, type=int,
-                       help=f'width of the image. Default is {DEFAULT_WIDTH}')
     parser.add_argument('input_file')
     parser.add_argument('output_file')
     args = parser.parse_args()
@@ -145,7 +135,7 @@ def main():
     if args.mode == 'from':
         image_to_file(args.input_file, args.output_file)
     elif args.mode == 'to':
-        file_to_image(args.input_file, args.output_file, args.width)
+        file_to_image(args.input_file, args.output_file)
 
 
 if __name__ == '__main__':
