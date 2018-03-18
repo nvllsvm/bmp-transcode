@@ -89,7 +89,7 @@ class ImageFile:
 
             image = PIL.Image.frombytes('RGB', (width, height),
                                         bytes(self.data))
-            image.save(self.path)
+            image.save(self.path, format='bmp')
             image.close()
         elif self.mode == 'r':
             self.image.close()
