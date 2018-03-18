@@ -1,6 +1,7 @@
 import argparse
 import io
 import math
+import sys
 
 import PIL.Image
 import pkg_resources
@@ -138,27 +139,44 @@ def file_to_image(input_file, output_file, width, height):
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description='Transcode orindary files to and from bitmap images.')
     parser.add_argument(
         '--version',
         action='version',
         version=pkg_resources.get_distribution('bmp-transcode').version)
+    parser.set_defaults(mode=None)
     sp = parser.add_subparsers()
-    sp_to = sp.add_parser('to', help='To bitmap')
-    sp_from = sp.add_parser('from', help='From bitmap')
-    sp_to.set_defaults(mode='to')
-    sp_to.add_argument('-x', '--width', type=int)
-    sp_to.add_argument('-y', '--height', type=int)
+
+    sp_from = sp.add_parser(
+        'from', help='recover a file from a bitmap image')
     sp_from.set_defaults(mode='from')
-    parser.add_argument('input_file')
-    parser.add_argument('output_file')
+    sp_from.add_argument('infile', help='image file to recover from')
+    sp_from.add_argument('outfile', help='recovered file')
+
+    sp_to = sp.add_parser(
+        'to', help='convert a file to a bitmap image')
+    sp_to.set_defaults(mode='to')
+    sp_to.add_argument('infile', help='file to be convert')
+    sp_to.add_argument('outfile', help='resulting image file')
+    sp_to.add_argument('--width', type=int, help='width in pixels')
+    sp_to.add_argument('--height', type=int, help='height in pixels')
+
     args = parser.parse_args()
 
     if args.mode == 'from':
-        image_to_file(args.input_file, args.output_file)
+        image_to_file(args.infile, args.outfile)
     elif args.mode == 'to':
+        if args.width and args.height:
+            sp_to.print_usage()
+            sys.stderr.writelines(
+                ('bmp-transcode to: error: '
+                 'arguments --width and --height cannot be used together\n'))
+            exit(2)
         file_to_image(
-            args.input_file, args.output_file, args.width, args.height)
+            args.infile, args.outfile, args.width, args.height)
+    else:
+        parser.print_help()
 
 
 if __name__ == '__main__':
