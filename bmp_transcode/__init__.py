@@ -12,7 +12,7 @@ MAX_FILE_SIZE = PIL.Image.MAX_IMAGE_PIXELS * 3
 
 class ImageFile:
 
-    def __init__(self, path, mode='r'):
+    def __init__(self, path, mode='r', width=None, height=None):
         self.path = path
         self.mode = mode
         self.error = False
@@ -27,6 +27,11 @@ class ImageFile:
         elif self.mode == 'w':
             self.data = bytearray()
             self.size = 0
+            self.width = width
+            self.height = height
+
+            if self.width is not None and self.height is not None:
+                raise ValueError('cannot specify both width and height')
         else:
             raise ValueError("invalid mode: '{}'".format(mode))
 
@@ -54,8 +59,15 @@ class ImageFile:
             size = len(self.data)
             size_block = int_to_bytes(size)
 
-            width = math.ceil(math.sqrt(size / 3))
-            height = math.ceil(size / width / 3)
+            if self.width is not None:
+                width = self.width
+                height = math.ceil(size / width / 3)
+            elif self.height is not None:
+                height = self.height
+                width = math.ceil(size / height / 3)
+            else:
+                width = math.ceil(math.sqrt(size / 3))
+                height = math.ceil(size / width / 3)
 
             while True:
                 max_size = (width * height) * 3
@@ -63,7 +75,10 @@ class ImageFile:
                 max_size_block = num_size_bytes(max_size)
                 extra_bytes = max_size - size - max_size_block
                 if extra_bytes < 0:
-                    height += 1
+                    if self.height is not None:
+                        width += 1
+                    else:
+                        height += 1
                 else:
                     extra_bytes += max_size_block - len(size_block)
                     break
@@ -111,8 +126,8 @@ def image_to_file(input_file, output_path):
             output_file.write(image.read())
 
 
-def file_to_image(input_file, output_file):
-    with ImageFile(output_file, 'w') as image:
+def file_to_image(input_file, output_file, width, height):
+    with ImageFile(output_file, 'w', width=width, height=height) as image:
         with open(input_file, 'rb') as f:
             while True:
                 chunk = f.read()
@@ -127,6 +142,8 @@ def main():
     sp_to = sp.add_parser('to', help='To bitmap')
     sp_from = sp.add_parser('from', help='From bitmap')
     sp_to.set_defaults(mode='to')
+    sp_to.add_argument('-x', '--width', type=int)
+    sp_to.add_argument('-y', '--height', type=int)
     sp_from.set_defaults(mode='from')
     parser.add_argument('input_file')
     parser.add_argument('output_file')
@@ -135,7 +152,8 @@ def main():
     if args.mode == 'from':
         image_to_file(args.input_file, args.output_file)
     elif args.mode == 'to':
-        file_to_image(args.input_file, args.output_file)
+        file_to_image(
+            args.input_file, args.output_file, args.width, args.height)
 
 
 if __name__ == '__main__':
