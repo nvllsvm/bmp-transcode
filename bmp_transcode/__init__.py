@@ -157,7 +157,7 @@ def main():
     sp_to = sp.add_parser(
         'to', help='convert a file to a bitmap image')
     sp_to.set_defaults(mode='to')
-    sp_to.add_argument('infile', help='file to be convert')
+    sp_to.add_argument('infile', help='file to convert')
     sp_to.add_argument('outfile', help='resulting image file')
     sp_to.add_argument('--width', type=int, help='width in pixels')
     sp_to.add_argument('--height', type=int, help='height in pixels')
