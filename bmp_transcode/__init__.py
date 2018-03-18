@@ -22,7 +22,7 @@ class ImageFile:
             self.data = self.image.tobytes()
 
             width, height = self.image.size
-            start_index = -1 * num_size_bytes(width * height)
+            start_index = -1 * num_size_bytes(width * height * 3)
             self.size = bytes_to_int(self.data[start_index:])
         elif self.mode == 'w':
             self.data = bytearray()
