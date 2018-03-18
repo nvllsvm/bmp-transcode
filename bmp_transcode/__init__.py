@@ -3,6 +3,7 @@ import io
 import math
 
 import PIL.Image
+import pkg_resources
 
 
 # Sizes larger than this may trip decompression bomb checks in pillow
@@ -138,6 +139,10 @@ def file_to_image(input_file, output_file, width, height):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--version',
+        action='version',
+        version=pkg_resources.get_distribution('bmp-transcode').version)
     sp = parser.add_subparsers()
     sp_to = sp.add_parser('to', help='To bitmap')
     sp_from = sp.add_parser('from', help='From bitmap')
