@@ -6,9 +6,9 @@ bmp-transcode
 Convert any file to a bitmap and back again. The resulting bitmap is a visual representation of the original file. The last pixel contains the size of the original file.
 
 
-For example, this is an mp3.
+For example, this is an mp3 hosted by a popular image host.
 
-.. image:: https://raw.githubusercontent.com/nvllsvm/bmp-transcode/master/example.bmp
+.. image:: https://i.imgur.com/jYjNcEY.png
     :alt: Maybe you should try listening this...
 
 Installation
