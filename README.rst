@@ -3,8 +3,7 @@ bmp-transcode
 
 |PyPi Version|
 
-Convert any file to a bitmap and back again. The resulting bitmap is a visual representation of the original file. The last pixel contains the size of the original file.
-
+Transcode orindary files to and from bitmap images.
 
 For example, this is an mp3 hosted by a popular image host.
 
