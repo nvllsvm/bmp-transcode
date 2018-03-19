@@ -3,12 +3,12 @@ bmp-transcode
 
 |PyPi Version|
 
-Transcode orindary files to and from bitmap images.
+Transcode ordinary files to and from bitmap images.
 
 For example, this is an mp3 hosted by a popular image host.
 
 .. image:: https://i.imgur.com/jYjNcEY.png
-    :alt: Maybe you should try listening this...
+    :alt: Maybe you should try listening to this...
 
 Installation
 ------------
