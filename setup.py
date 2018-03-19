@@ -4,7 +4,7 @@ import setuptools
 setuptools.setup(
     name='bmp-transcode',
     version='0.3.0',
-    description='Transcode orindary files to and from bitmap images.',
+    description='Transcode ordinary files to and from bitmap images.',
     long_description=open('README.rst').read(),
     author='Andrew Rabert',
     author_email='arabert@nullsum.net',

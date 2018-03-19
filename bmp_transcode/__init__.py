@@ -140,7 +140,7 @@ def file_to_image(input_file, output_file, width, height):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Transcode orindary files to and from bitmap images.')
+        description='Transcode ordinary files to and from bitmap images.')
     parser.add_argument(
         '--version',
         action='version',
