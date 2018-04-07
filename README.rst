@@ -37,4 +37,4 @@ To the original file:
 
 
 .. |PyPi Version| image:: https://img.shields.io/pypi/v/bmp_transcode.svg?
-   :target: https://pypi.python.org/pypi/bmp_transcode
+   :target: https://pypi.org/pypi/bmp_transcode
