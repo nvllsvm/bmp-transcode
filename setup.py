@@ -7,7 +7,7 @@ setuptools.setup(
     description='Transcode ordinary files to and from bitmap images.',
     long_description=open('README.rst').read(),
     author='Andrew Rabert',
-    author_email='arabert@nullsum.net',
+    author_email='ar@nullsum.net',
     url='https://github.com/nvllsvm/bmp-transcode',
     license='Apache 2.0',
     packages=['bmp_transcode'],
