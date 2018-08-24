@@ -12,12 +12,12 @@ setuptools.setup(
     license='Apache 2.0',
     packages=['bmp_transcode'],
     install_requires=['pillow'],
-    classifiers=(
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3 :: Only'
-    ),
+    ],
     entry_points={
         'console_scripts': ['bmp-transcode=bmp_transcode:main']
     }
