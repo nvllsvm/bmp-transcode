@@ -1,15 +1,20 @@
 import argparse
+import importlib.metadata
 import io
 import math
 import sys
 
 import PIL.Image
-import pkg_resources
 
 
 # Sizes larger than this may trip decompression bomb checks in pillow
 # https://github.com/python-pillow/Pillow/blob/ddc9e73b476965b17d9b6c8513da78a0b0877d57/src/PIL/Image.py#L2497
 MAX_FILE_SIZE = PIL.Image.MAX_IMAGE_PIXELS * 3
+
+try:
+    _VERSION = importlib.metadata.version('bmp-transcode')
+except importlib.metadata.PackageNotFoundError:
+    _VERSION = 'unknown'
 
 
 class ImageFile:
@@ -144,7 +149,7 @@ def main():
     parser.add_argument(
         '--version',
         action='version',
-        version=pkg_resources.get_distribution('bmp-transcode').version)
+        version=_VERSION)
     parser.set_defaults(mode=None)
     sp = parser.add_subparsers()
 
