@@ -5,9 +5,9 @@ bmp-transcode
 
 Transcode ordinary files to and from bitmap images.
 
-For example, this is an mp3 hosted by a popular image host.
+For example, this is an mp3.
 
-.. image:: https://i.imgur.com/jYjNcEY.png
+.. image:: example.bmp
     :alt: Maybe you should try listening to this...
 
 Installation
